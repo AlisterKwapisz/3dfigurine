@@ -1,35 +1,49 @@
-# 3D Low-Poly White Robot Website
+# 3D Highly Detailed Low-Poly White Robot Website
 
-An interactive 3D website featuring a cute, low-poly white robot made of flat hexagonal and triangular surfaces that tracks your cursor movement.
+An interactive 3D website featuring an incredibly detailed, low-poly white robot with soft beveling, enhanced lighting, and extensive geometric details that tracks your cursor movement.
 
 ## Features
 
-- **Low-Poly Design**: Clean white robot constructed entirely from flat geometric surfaces:
-  - Hexagonal prisms for head, body, neck, arms, and legs
-  - Triangular and hexagonal face details
-  - Low-segment spheres for joints
-  - Flat-shaded rendering for authentic low-poly aesthetic
-- **Interactive Cursor Tracking**: The robot's head and neck follow your mouse cursor in real-time with correct directional tracking
-- **Polished White Material**: 
-  - Smooth white surface (low metalness, low roughness)
-  - Environment mapping for subtle reflections
-  - Flat shading for geometric definition
-- **Glowing Cyan Eyes**: Low-poly spherical eyes with emissive cyan glow and point lights
-- **Geometric Details**:
-  - Hexagonal head with pyramid top
-  - Hexagonal antenna with glowing tip
-  - Triangular chest indicator light
-  - All body parts use 6-8 sided geometry for clean facets
-- **Dynamic Lighting System**: 
-  - Directional lights (main, fill, and rim)
-  - Point lights for highlights
-  - Hemisphere light for ambient illumination
-  - High-quality shadow mapping
-- **Idle Animations**: 
+- **Ultra-Detailed Low-Poly Design**: Highly detailed white robot with soft beveled edges:
+  - Multi-segment limbs (shoulder → upper arm → elbow → lower arm → wrist → hand)
+  - Detailed joints and connection points
+  - Complex head assembly with multiple parts and antenna
+  - Articulated leg sections (hip → thigh → knee → calf → ankle)
+  - Detailed feet with toes and sole details
+  - Soft beveling through high-segment geometry (8-16 segments)
+
+- **Interactive Cursor Tracking**: The robot's head and neck follow your mouse cursor with smooth, realistic movement
+
+- **Enhanced Polished White Material**:
+  - Pure white surface with low metalness (0.05) and roughness (0.08)
+  - Clearcoat layer for glossy finish
+  - Environment mapping for realistic reflections
+  - Multiple material variants for depth and contrast
+
+- **Advanced Geometric Details**:
+  - **Head**: Crown rings, face panels, multi-section antenna, detailed eyes
+  - **Body**: Chest vents, indicator lights, shoulder pads, torso belt, hip panels
+  - **Arms**: Multiple joint segments, detailed fingers, realistic proportions
+  - **Legs**: Hip joints, thigh/calf sections, knee/ankle joints
+  - **Feet**: Toes, sole details, realistic foot geometry
+
+- **Dramatically Enhanced Lighting System**:
+  - Main directional light with soft shadows (4096x4096 resolution)
+  - Multiple fill lights (cool blue, warm orange)
+  - Three accent point lights with realistic decay
+  - Spotlight for dramatic highlighting
+  - Hemisphere light for natural ambient illumination
+  - Enhanced shadow mapping with radius blur
+
+- **Glowing Elements**: Cyan LED eyes, green chest indicators, and antenna tip with emissive materials and point lights
+
+- **Advanced Animations**:
+  - Smooth head and neck tracking with proper lerping
   - Subtle breathing effect
-  - Pulsing eye animation
-  - Smooth interpolated movements
-- **Responsive Design**: Works across different screen sizes
+  - Pulsing eye glow animation
+  - Realistic joint rotations
+
+- **Technical Excellence**: High-performance rendering with optimized geometry and materials
 
 ## Technologies Used
 
