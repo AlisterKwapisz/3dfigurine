@@ -1,17 +1,25 @@
-# 3D Silver Robot Website
+# 3D Low-Poly White Robot Website
 
-An interactive 3D website featuring a cute, soft-edged silver robot that tracks your cursor movement with realistic PBR shading.
+An interactive 3D website featuring a cute, low-poly white robot made of flat hexagonal and triangular surfaces that tracks your cursor movement.
 
 ## Features
 
-- **Cute Soft-Edged Robot**: A friendly silver robot with rounded, low-poly aesthetics
-- **Interactive Cursor Tracking**: The robot's head and neck follow your mouse cursor in real-time
-- **Enhanced PBR Shaders**: Physically-based rendering with:
-  - High metalness (0.95) and low roughness (0.15) for realistic silver
-  - Clearcoat layer for added realism
-  - Environment mapping for accurate light reflections
-  - Multiple material variants for depth and detail
-- **Glowing LED Eyes**: Cyan-colored eyes with emissive materials and point lights for authentic glow
+- **Low-Poly Design**: Clean white robot constructed entirely from flat geometric surfaces:
+  - Hexagonal prisms for head, body, neck, arms, and legs
+  - Triangular and hexagonal face details
+  - Low-segment spheres for joints
+  - Flat-shaded rendering for authentic low-poly aesthetic
+- **Interactive Cursor Tracking**: The robot's head and neck follow your mouse cursor in real-time with correct directional tracking
+- **Polished White Material**: 
+  - Smooth white surface (low metalness, low roughness)
+  - Environment mapping for subtle reflections
+  - Flat shading for geometric definition
+- **Glowing Cyan Eyes**: Low-poly spherical eyes with emissive cyan glow and point lights
+- **Geometric Details**:
+  - Hexagonal head with pyramid top
+  - Hexagonal antenna with glowing tip
+  - Triangular chest indicator light
+  - All body parts use 6-8 sided geometry for clean facets
 - **Dynamic Lighting System**: 
   - Directional lights (main, fill, and rim)
   - Point lights for highlights
