@@ -79,202 +79,205 @@ function init() {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
-    // Enhanced silver PBR material with realistic properties
-    const silverMaterial = new THREE.MeshStandardMaterial({
-        color: 0xd4d4d4,
-        metalness: 0.95,
-        roughness: 0.15,
-        envMapIntensity: 2.0,
-        clearcoat: 0.3,
-        clearcoatRoughness: 0.2,
+    // White polished material for low-poly robot
+    const whiteMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        metalness: 0.1,
+        roughness: 0.1,
+        envMapIntensity: 1.0,
+        flatShading: true, // For that low-poly look
     });
 
-    // Darker silver for accents
-    const darkSilverMaterial = new THREE.MeshStandardMaterial({
-        color: 0x909090,
-        metalness: 0.9,
-        roughness: 0.25,
-        envMapIntensity: 1.5,
-    });
-
-    // LED eye material (glowing)
+    // LED eye material (glowing cyan)
     const eyeMaterial = new THREE.MeshStandardMaterial({
         color: 0x00ffff,
         emissive: 0x00ddff,
-        emissiveIntensity: 2,
-        metalness: 0.1,
-        roughness: 0.2,
+        emissiveIntensity: 2.5,
+        flatShading: true,
     });
 
     // Create robot
     robot = new THREE.Group();
 
-    // ===== HEAD =====
-    // Main head (rounded box shape)
-    const headGeometry = new THREE.BoxGeometry(0.7, 0.6, 0.6, 32, 32, 32);
-    head = new THREE.Mesh(headGeometry, silverMaterial);
-    head.position.y = 2.8;
-    head.castShadow = true;
-    head.receiveShadow = true;
-    robot.add(head);
+    // ===== HEAD GROUP =====
+    head = new THREE.Group();
+    
+    // Main head (hexagonal prism for low-poly look)
+    const headGeometry = new THREE.CylinderGeometry(0.35, 0.35, 0.6, 6);
+    const headMesh = new THREE.Mesh(headGeometry, whiteMaterial);
+    headMesh.castShadow = true;
+    headMesh.receiveShadow = true;
+    head.add(headMesh);
 
-    // Top of head (dome)
-    const headTopGeometry = new THREE.SphereGeometry(0.35, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
-    const headTop = new THREE.Mesh(headTopGeometry, silverMaterial);
-    headTop.position.y = 3.1;
+    // Top of head (low-poly pyramid/cone)
+    const headTopGeometry = new THREE.ConeGeometry(0.35, 0.3, 6);
+    const headTop = new THREE.Mesh(headTopGeometry, whiteMaterial);
+    headTop.position.y = 0.45;
     headTop.castShadow = true;
-    robot.add(headTop);
+    head.add(headTop);
 
-    // Face plate (slightly darker)
-    const faceGeometry = new THREE.BoxGeometry(0.65, 0.5, 0.05, 32, 32, 32);
-    const facePlate = new THREE.Mesh(faceGeometry, darkSilverMaterial);
-    facePlate.position.set(0, 2.8, 0.32);
+    // Face plate (flat hexagon)
+    const facePlateGeometry = new THREE.CircleGeometry(0.3, 6);
+    const facePlate = new THREE.Mesh(facePlateGeometry, whiteMaterial);
+    facePlate.position.set(0, 0, 0.36);
     facePlate.castShadow = true;
-    robot.add(facePlate);
+    head.add(facePlate);
 
-    // Eyes (glowing cyan LEDs)
-    const eyeGeometry = new THREE.SphereGeometry(0.08, 32, 32);
+    // Eyes (glowing cyan - low poly spheres)
+    const eyeGeometry = new THREE.SphereGeometry(0.08, 8, 8);
     leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-    leftEye.position.set(-0.15, 2.85, 0.35);
+    leftEye.position.set(-0.12, 0.05, 0.38);
     leftEye.castShadow = false;
-    robot.add(leftEye);
+    head.add(leftEye);
 
     rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-    rightEye.position.set(0.15, 2.85, 0.35);
+    rightEye.position.set(0.12, 0.05, 0.38);
     rightEye.castShadow = false;
-    robot.add(rightEye);
+    head.add(rightEye);
 
     // Add point lights to eyes for glow effect
-    const leftEyeLight = new THREE.PointLight(0x00ffff, 0.8, 2);
+    const leftEyeLight = new THREE.PointLight(0x00ffff, 1, 2);
     leftEye.add(leftEyeLight);
-    const rightEyeLight = new THREE.PointLight(0x00ffff, 0.8, 2);
+    const rightEyeLight = new THREE.PointLight(0x00ffff, 1, 2);
     rightEye.add(rightEyeLight);
 
-    // Antenna
-    const antennaBaseGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.2, 16);
-    const antennaBase = new THREE.Mesh(antennaBaseGeometry, darkSilverMaterial);
-    antennaBase.position.y = 3.35;
+    // Antenna (hexagonal prism)
+    const antennaBaseGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.25, 6);
+    const antennaBase = new THREE.Mesh(antennaBaseGeometry, whiteMaterial);
+    antennaBase.position.y = 0.68;
     antennaBase.castShadow = true;
-    robot.add(antennaBase);
+    head.add(antennaBase);
 
-    const antennaTipGeometry = new THREE.SphereGeometry(0.06, 32, 32);
+    const antennaTipGeometry = new THREE.SphereGeometry(0.06, 6, 6);
     const antennaTip = new THREE.Mesh(antennaTipGeometry, eyeMaterial);
-    antennaTip.position.y = 3.5;
+    antennaTip.position.y = 0.85;
     antennaTip.castShadow = true;
-    robot.add(antennaTip);
+    head.add(antennaTip);
+
+    // Position head and add to robot
+    head.position.y = 2.8;
+    robot.add(head);
 
     // ===== NECK =====
     neck = new THREE.Group();
-    const neckGeometry = new THREE.CylinderGeometry(0.18, 0.22, 0.25, 32);
-    const neckMesh = new THREE.Mesh(neckGeometry, darkSilverMaterial);
+    const neckGeometry = new THREE.CylinderGeometry(0.18, 0.22, 0.3, 6);
+    const neckMesh = new THREE.Mesh(neckGeometry, whiteMaterial);
     neckMesh.castShadow = true;
     neckMesh.receiveShadow = true;
     neck.add(neckMesh);
-    neck.position.y = 2.4;
+    neck.position.y = 2.35;
     robot.add(neck);
 
     // ===== BODY =====
-    // Main torso (rounded box)
-    const torsoGeometry = new THREE.BoxGeometry(0.9, 0.9, 0.7, 32, 32, 32);
-    const torso = new THREE.Mesh(torsoGeometry, silverMaterial);
+    // Main torso (hexagonal prism)
+    const torsoGeometry = new THREE.CylinderGeometry(0.45, 0.5, 1.0, 6);
+    const torso = new THREE.Mesh(torsoGeometry, whiteMaterial);
     torso.position.y = 1.7;
     torso.castShadow = true;
     torso.receiveShadow = true;
     robot.add(torso);
 
-    // Chest panel (detail)
-    const chestPanelGeometry = new THREE.BoxGeometry(0.5, 0.6, 0.05);
-    const chestPanel = new THREE.Mesh(chestPanelGeometry, darkSilverMaterial);
-    chestPanel.position.set(0, 1.7, 0.36);
+    // Chest panel (flat hexagon detail)
+    const chestPanelGeometry = new THREE.CircleGeometry(0.25, 6);
+    const chestPanel = new THREE.Mesh(chestPanelGeometry, whiteMaterial);
+    chestPanel.position.set(0, 1.8, 0.46);
     chestPanel.castShadow = true;
     robot.add(chestPanel);
 
-    // Chest light indicator
-    const chestLightGeometry = new THREE.CircleGeometry(0.05, 32);
+    // Chest light indicator (triangular)
+    const chestLightGeometry = new THREE.CircleGeometry(0.06, 3);
     const chestLightMaterial = new THREE.MeshStandardMaterial({
         color: 0x00ff88,
         emissive: 0x00ff88,
-        emissiveIntensity: 1.5,
+        emissiveIntensity: 2,
+        flatShading: true,
     });
     const chestLight = new THREE.Mesh(chestLightGeometry, chestLightMaterial);
-    chestLight.position.set(0, 1.85, 0.39);
+    chestLight.position.set(0, 1.8, 0.48);
     robot.add(chestLight);
 
     // ===== ARMS =====
-    // Left arm
-    const shoulderGeometry = new THREE.SphereGeometry(0.18, 32, 32);
-    const leftShoulder = new THREE.Mesh(shoulderGeometry, darkSilverMaterial);
-    leftShoulder.position.set(-0.55, 1.9, 0);
+    // Left shoulder (low-poly sphere/icosahedron)
+    const shoulderGeometry = new THREE.SphereGeometry(0.18, 8, 6);
+    const leftShoulder = new THREE.Mesh(shoulderGeometry, whiteMaterial);
+    leftShoulder.position.set(-0.55, 2.0, 0);
     leftShoulder.castShadow = true;
     robot.add(leftShoulder);
 
-    const armGeometry = new THREE.CapsuleGeometry(0.12, 0.6, 16, 32);
-    const leftArm = new THREE.Mesh(armGeometry, silverMaterial);
+    // Left arm (hexagonal prism)
+    const armGeometry = new THREE.CylinderGeometry(0.11, 0.11, 0.7, 6);
+    const leftArm = new THREE.Mesh(armGeometry, whiteMaterial);
     leftArm.position.set(-0.65, 1.5, 0);
     leftArm.rotation.z = 0.2;
     leftArm.castShadow = true;
     leftArm.receiveShadow = true;
     robot.add(leftArm);
 
-    const leftHandGeometry = new THREE.SphereGeometry(0.15, 32, 32);
-    const leftHand = new THREE.Mesh(leftHandGeometry, silverMaterial);
+    // Left hand (low-poly sphere)
+    const leftHandGeometry = new THREE.SphereGeometry(0.14, 8, 6);
+    const leftHand = new THREE.Mesh(leftHandGeometry, whiteMaterial);
     leftHand.position.set(-0.75, 1.1, 0);
     leftHand.castShadow = true;
     robot.add(leftHand);
 
-    // Right arm
-    const rightShoulder = new THREE.Mesh(shoulderGeometry, darkSilverMaterial);
-    rightShoulder.position.set(0.55, 1.9, 0);
+    // Right shoulder
+    const rightShoulder = new THREE.Mesh(shoulderGeometry, whiteMaterial);
+    rightShoulder.position.set(0.55, 2.0, 0);
     rightShoulder.castShadow = true;
     robot.add(rightShoulder);
 
-    const rightArm = new THREE.Mesh(armGeometry, silverMaterial);
+    // Right arm
+    const rightArm = new THREE.Mesh(armGeometry, whiteMaterial);
     rightArm.position.set(0.65, 1.5, 0);
     rightArm.rotation.z = -0.2;
     rightArm.castShadow = true;
     rightArm.receiveShadow = true;
     robot.add(rightArm);
 
-    const rightHandGeometry = new THREE.SphereGeometry(0.15, 32, 32);
-    const rightHand = new THREE.Mesh(rightHandGeometry, silverMaterial);
+    // Right hand
+    const rightHandGeometry = new THREE.SphereGeometry(0.14, 8, 6);
+    const rightHand = new THREE.Mesh(rightHandGeometry, whiteMaterial);
     rightHand.position.set(0.75, 1.1, 0);
     rightHand.castShadow = true;
     robot.add(rightHand);
 
     // ===== LOWER BODY =====
-    const hipsGeometry = new THREE.BoxGeometry(0.7, 0.3, 0.6, 32, 32, 32);
-    const hips = new THREE.Mesh(hipsGeometry, darkSilverMaterial);
-    hips.position.y = 1.05;
+    // Hips (triangular prism / low-poly trapezoid)
+    const hipsGeometry = new THREE.CylinderGeometry(0.35, 0.4, 0.35, 6);
+    const hips = new THREE.Mesh(hipsGeometry, whiteMaterial);
+    hips.position.y = 1.0;
     hips.castShadow = true;
     hips.receiveShadow = true;
     robot.add(hips);
 
     // ===== LEGS =====
-    const legGeometry = new THREE.CapsuleGeometry(0.15, 0.7, 16, 32);
-    
-    const leftLeg = new THREE.Mesh(legGeometry, silverMaterial);
-    leftLeg.position.set(-0.22, 0.5, 0);
+    // Left leg (hexagonal prism)
+    const legGeometry = new THREE.CylinderGeometry(0.14, 0.12, 0.8, 6);
+    const leftLeg = new THREE.Mesh(legGeometry, whiteMaterial);
+    leftLeg.position.set(-0.18, 0.45, 0);
     leftLeg.castShadow = true;
     leftLeg.receiveShadow = true;
     robot.add(leftLeg);
 
-    const rightLeg = new THREE.Mesh(legGeometry, silverMaterial);
-    rightLeg.position.set(0.22, 0.5, 0);
+    // Right leg
+    const rightLeg = new THREE.Mesh(legGeometry, whiteMaterial);
+    rightLeg.position.set(0.18, 0.45, 0);
     rightLeg.castShadow = true;
     rightLeg.receiveShadow = true;
     robot.add(rightLeg);
 
     // ===== FEET =====
-    const footGeometry = new THREE.BoxGeometry(0.25, 0.15, 0.35, 32, 32, 32);
-    
-    const leftFoot = new THREE.Mesh(footGeometry, darkSilverMaterial);
-    leftFoot.position.set(-0.22, 0.08, 0.05);
+    // Left foot (flat triangular prism)
+    const footGeometry = new THREE.BoxGeometry(0.22, 0.12, 0.35);
+    const leftFoot = new THREE.Mesh(footGeometry, whiteMaterial);
+    leftFoot.position.set(-0.18, 0.06, 0.08);
     leftFoot.castShadow = true;
     leftFoot.receiveShadow = true;
     robot.add(leftFoot);
 
-    const rightFoot = new THREE.Mesh(footGeometry, darkSilverMaterial);
-    rightFoot.position.set(0.22, 0.08, 0.05);
+    // Right foot
+    const rightFoot = new THREE.Mesh(footGeometry, whiteMaterial);
+    rightFoot.position.set(0.18, 0.06, 0.08);
     rightFoot.castShadow = true;
     rightFoot.receiveShadow = true;
     robot.add(rightFoot);
@@ -316,13 +319,10 @@ function onWindowResize() {
 function animate() {
     requestAnimationFrame(animate);
 
-    // Make robot head look at cursor
-    const targetX = mouse.x * 2;
-    const targetY = mouse.y * 2 + 2.8;
-    
+    // Make robot head look at cursor (FIXED DIRECTION)
     // Calculate target rotation for head
-    targetRotation.y = -mouse.x * 0.6;
-    targetRotation.x = mouse.y * 0.4;
+    targetRotation.y = mouse.x * 0.6;  // REMOVED the negative sign to fix reversed looking
+    targetRotation.x = -mouse.y * 0.4;  // ADDED negative to fix vertical inversion
     
     // Smooth head rotation with lerping
     head.rotation.y += (targetRotation.y - head.rotation.y) * 0.08;
@@ -333,11 +333,11 @@ function animate() {
     neck.rotation.x += (targetRotation.x * 0.2 - neck.rotation.x) * 0.06;
 
     // Subtle body rotation following cursor
-    robot.rotation.y += (-mouse.x * 0.15 - robot.rotation.y) * 0.03;
+    robot.rotation.y += (mouse.x * 0.15 - robot.rotation.y) * 0.03;
 
     // Animate eyes (subtle pulsing)
     const time = Date.now() * 0.001;
-    const eyePulse = 1 + Math.sin(time * 2) * 0.15;
+    const eyePulse = 1 + Math.sin(time * 2) * 0.12;
     leftEye.scale.set(eyePulse, eyePulse, eyePulse);
     rightEye.scale.set(eyePulse, eyePulse, eyePulse);
 
