@@ -21,11 +21,12 @@ An interactive 3D website featuring an incredibly detailed, low-poly white robot
   - Multiple material variants for depth and contrast
 
 - **Advanced Geometric Details**:
-  - **Head**: Crown rings, face panels, multi-section antenna, detailed eyes
-  - **Body**: Chest vents, indicator lights, shoulder pads, torso belt, hip panels
-  - **Arms**: Multiple joint segments, detailed fingers, realistic proportions
-  - **Legs**: Hip joints, thigh/calf sections, knee/ankle joints
-  - **Feet**: Toes, sole details, realistic foot geometry
+  - **Head**: Crown rings, face panels, multi-section antenna with glow, detailed eyes
+  - **Body**: Chest vents, indicator lights, shoulder pads, torso belt, hip panels, multi-plate spine, rear power backpack and thrusters
+  - **Arms**: Multiple joint segments, detailed fingers, forearm plating, articulated wrists
+  - **Legs**: Hip joints, thigh/calf sections, knee/ankle joints, decorative hip cables
+  - **Feet**: Toes, sole details, realistic foot geometry with accent lighting
+- **Edge-Lit Styling**: Subtle glowing edge outlines that enhance silhouette readability without losing the low-poly character
 
 - **Dramatically Enhanced Lighting System**:
   - Main directional light with soft shadows (4096x4096 resolution)
@@ -35,13 +36,13 @@ An interactive 3D website featuring an incredibly detailed, low-poly white robot
   - Hemisphere light for natural ambient illumination
   - Enhanced shadow mapping with radius blur
 
-- **Glowing Elements**: Cyan LED eyes, green chest indicators, and antenna tip with emissive materials and point lights
+- **Glowing Elements**: Cyan LED eyes, pulsing antenna tip, chest indicators, backpack panels, floor ring, and thruster vents with emissive materials and synchronised point lights
 
 - **Advanced Animations**:
   - Smooth head and neck tracking with proper lerping
   - Subtle breathing effect
-  - Pulsing eye glow animation
-  - Realistic joint rotations
+  - Pulsing eye/antenna/backpack/floor glow animations
+  - Realistic joint rotations with secondary swaying for arms, legs, and thrusters
 
 - **Technical Excellence**: High-performance rendering with optimized geometry and materials
 
