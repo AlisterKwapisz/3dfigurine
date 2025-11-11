@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-let scene, camera, renderer, figurine, head, leftArm, rightArm;
+let scene, camera, renderer, figurine, head, leftArm, rightArm, controls;
 let mouse = new THREE.Vector2();
 let targetRotation = new THREE.Euler();
 
@@ -32,7 +33,7 @@ function init() {
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
     // Controls
-    const controls = new OrbitControls(camera, renderer.domElement);
+    controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.minDistance = 3;
@@ -75,7 +76,7 @@ function init() {
 
     // Environment map for realistic reflections
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    scene.environment = pmremGenerator.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+    scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
     // Silver PBR material with realistic properties
     const silverMaterial = new THREE.MeshStandardMaterial({
@@ -223,6 +224,9 @@ function onWindowResize() {
 
 function animate() {
     requestAnimationFrame(animate);
+
+    // Update controls
+    controls.update();
 
     // Make figurine look at cursor
     const targetX = mouse.x * 2;
