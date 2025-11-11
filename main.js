@@ -32,68 +32,105 @@ function init() {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-    // Lighting setup for realistic rendering
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    // Enhanced lighting system for detailed robot
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
     scene.add(ambientLight);
 
-    // Main directional light (sun-like)
-    const mainLight = new THREE.DirectionalLight(0xffffff, 2);
-    mainLight.position.set(5, 10, 7);
+    // Main directional light (soft sunlight)
+    const mainLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    mainLight.position.set(5, 12, 8);
     mainLight.castShadow = true;
-    mainLight.shadow.mapSize.width = 2048;
-    mainLight.shadow.mapSize.height = 2048;
+    mainLight.shadow.mapSize.width = 4096;
+    mainLight.shadow.mapSize.height = 4096;
     mainLight.shadow.camera.near = 0.5;
     mainLight.shadow.camera.far = 50;
-    mainLight.shadow.camera.left = -10;
-    mainLight.shadow.camera.right = 10;
-    mainLight.shadow.camera.top = 10;
-    mainLight.shadow.camera.bottom = -10;
-    mainLight.shadow.bias = -0.0001;
+    mainLight.shadow.camera.left = -12;
+    mainLight.shadow.camera.right = 12;
+    mainLight.shadow.camera.top = 12;
+    mainLight.shadow.camera.bottom = -12;
+    mainLight.shadow.bias = -0.00005;
+    mainLight.shadow.radius = 4;
     scene.add(mainLight);
 
-    // Fill light (blue tinted)
-    const fillLight = new THREE.DirectionalLight(0x6ba3ff, 1.2);
-    fillLight.position.set(-5, 5, -3);
+    // Fill light (cool blue)
+    const fillLight = new THREE.DirectionalLight(0x87ceeb, 0.8);
+    fillLight.position.set(-6, 8, -4);
+    fillLight.castShadow = true;
+    fillLight.shadow.mapSize.width = 2048;
+    fillLight.shadow.mapSize.height = 2048;
     scene.add(fillLight);
 
-    // Rim light (warm accent)
-    const rimLight = new THREE.DirectionalLight(0xffb366, 0.8);
-    rimLight.position.set(0, 3, -8);
+    // Rim light (warm orange)
+    const rimLight = new THREE.DirectionalLight(0xffa500, 0.6);
+    rimLight.position.set(0, 4, -10);
     scene.add(rimLight);
 
-    // Point lights for highlights
-    const pointLight1 = new THREE.PointLight(0xffffff, 1.5, 25);
-    pointLight1.position.set(4, 6, 4);
+    // Accent point lights for robot details
+    const pointLight1 = new THREE.PointLight(0xffffff, 1.2, 30);
+    pointLight1.position.set(6, 8, 6);
+    pointLight1.decay = 2;
     scene.add(pointLight1);
 
-    const pointLight2 = new THREE.PointLight(0x88ddff, 1, 20);
-    pointLight2.position.set(-4, 4, -2);
+    const pointLight2 = new THREE.PointLight(0xaaddff, 0.8, 25);
+    pointLight2.position.set(-5, 6, -3);
+    pointLight2.decay = 2;
     scene.add(pointLight2);
 
-    // Add hemisphere light for better ambient
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
-    hemiLight.position.set(0, 20, 0);
+    const pointLight3 = new THREE.PointLight(0xffddaa, 0.6, 20);
+    pointLight3.position.set(3, 10, -2);
+    pointLight3.decay = 2;
+    scene.add(pointLight3);
+
+    // Hemisphere light for better ambient
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x333333, 0.4);
+    hemiLight.position.set(0, 25, 0);
     scene.add(hemiLight);
+
+    // Spotlight for dramatic effect
+    const spotLight = new THREE.SpotLight(0xffffff, 0.8, 40, Math.PI / 6, 0.5, 2);
+    spotLight.position.set(0, 15, 10);
+    spotLight.target.position.set(0, 2, 0);
+    spotLight.castShadow = true;
+    spotLight.shadow.mapSize.width = 2048;
+    spotLight.shadow.mapSize.height = 2048;
+    spotLight.shadow.bias = -0.0001;
+    scene.add(spotLight);
+    scene.add(spotLight.target);
 
     // Environment map for realistic reflections
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
-    // White polished material for low-poly robot
+    // Enhanced white polished material with better lighting response
     const whiteMaterial = new THREE.MeshStandardMaterial({
         color: 0xffffff,
-        metalness: 0.1,
-        roughness: 0.1,
-        envMapIntensity: 1.0,
-        flatShading: true, // For that low-poly look
+        metalness: 0.05,
+        roughness: 0.08,
+        envMapIntensity: 1.2,
+        clearcoat: 0.1,
+        clearcoatRoughness: 0.1,
     });
 
-    // LED eye material (glowing cyan)
+    // Darker accent material for details
+    const darkAccentMaterial = new THREE.MeshStandardMaterial({
+        color: 0xe0e0e0,
+        metalness: 0.1,
+        roughness: 0.2,
+        envMapIntensity: 0.8,
+    });
+
+    // LED eye material (glowing cyan with better intensity)
     const eyeMaterial = new THREE.MeshStandardMaterial({
         color: 0x00ffff,
-        emissive: 0x00ddff,
-        emissiveIntensity: 2.5,
-        flatShading: true,
+        emissive: 0x00aaff,
+        emissiveIntensity: 3.0,
+    });
+
+    // Glowing accent material for indicators
+    const glowMaterial = new THREE.MeshStandardMaterial({
+        color: 0x00ff88,
+        emissive: 0x00ff88,
+        emissiveIntensity: 2.0,
     });
 
     // Create robot
@@ -101,30 +138,46 @@ function init() {
 
     // ===== HEAD GROUP =====
     head = new THREE.Group();
-    
-    // Main head (hexagonal prism for low-poly look)
-    const headGeometry = new THREE.CylinderGeometry(0.35, 0.35, 0.6, 6);
+
+    // Main head (hexagonal prism with more segments for softer edges)
+    const headGeometry = new THREE.CylinderGeometry(0.35, 0.35, 0.6, 12);
     const headMesh = new THREE.Mesh(headGeometry, whiteMaterial);
     headMesh.castShadow = true;
     headMesh.receiveShadow = true;
     head.add(headMesh);
 
-    // Top of head (low-poly pyramid/cone)
-    const headTopGeometry = new THREE.ConeGeometry(0.35, 0.3, 6);
+    // Head crown/detail ring
+    const crownGeometry = new THREE.TorusGeometry(0.36, 0.02, 8, 12);
+    const crown = new THREE.Mesh(crownGeometry, darkAccentMaterial);
+    crown.position.y = 0.1;
+    crown.castShadow = true;
+    head.add(crown);
+
+    // Top of head (smooth cone with more segments)
+    const headTopGeometry = new THREE.ConeGeometry(0.35, 0.3, 12);
     const headTop = new THREE.Mesh(headTopGeometry, whiteMaterial);
     headTop.position.y = 0.45;
     headTop.castShadow = true;
     head.add(headTop);
 
-    // Face plate (flat hexagon)
-    const facePlateGeometry = new THREE.CircleGeometry(0.3, 6);
+    // Face plate (smooth hexagon with more detail)
+    const facePlateGeometry = new THREE.CircleGeometry(0.3, 12);
     const facePlate = new THREE.Mesh(facePlateGeometry, whiteMaterial);
     facePlate.position.set(0, 0, 0.36);
     facePlate.castShadow = true;
     head.add(facePlate);
 
-    // Eyes (glowing cyan - low poly spheres)
-    const eyeGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+    // Face panel details (horizontal lines)
+    for (let i = 0; i < 3; i++) {
+        const panelGeometry = new THREE.BoxGeometry(0.55, 0.02, 0.01);
+        const panel = new THREE.Mesh(panelGeometry, darkAccentMaterial);
+        panel.position.set(0, -0.08 + i * 0.08, 0.35);
+        panel.castShadow = true;
+        head.add(panel);
+    }
+
+    // Eyes (smooth spheres with more segments)
+    const eyeGeometry = new THREE.SphereGeometry(0.08, 16, 16);
     leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
     leftEye.position.set(-0.12, 0.05, 0.38);
     leftEye.castShadow = false;
@@ -136,23 +189,35 @@ function init() {
     head.add(rightEye);
 
     // Add point lights to eyes for glow effect
-    const leftEyeLight = new THREE.PointLight(0x00ffff, 1, 2);
+    const leftEyeLight = new THREE.PointLight(0x00ffff, 1.2, 3);
     leftEye.add(leftEyeLight);
-    const rightEyeLight = new THREE.PointLight(0x00ffff, 1, 2);
+    const rightEyeLight = new THREE.PointLight(0x00ffff, 1.2, 3);
     rightEye.add(rightEyeLight);
 
-    // Antenna (hexagonal prism)
-    const antennaBaseGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.25, 6);
-    const antennaBase = new THREE.Mesh(antennaBaseGeometry, whiteMaterial);
-    antennaBase.position.y = 0.68;
+    // Enhanced antenna system
+    const antennaBaseGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.3, 8);
+    const antennaBase = new THREE.Mesh(antennaBaseGeometry, darkAccentMaterial);
+    antennaBase.position.y = 0.7;
     antennaBase.castShadow = true;
     head.add(antennaBase);
 
-    const antennaTipGeometry = new THREE.SphereGeometry(0.06, 6, 6);
+    // Antenna mid section
+    const antennaMidGeometry = new THREE.CylinderGeometry(0.03, 0.05, 0.15, 6);
+    const antennaMid = new THREE.Mesh(antennaMidGeometry, darkAccentMaterial);
+    antennaMid.position.y = 0.87;
+    antennaMid.castShadow = true;
+    head.add(antennaMid);
+
+    // Antenna tip (glowing sphere)
+    const antennaTipGeometry = new THREE.SphereGeometry(0.08, 12, 12);
     const antennaTip = new THREE.Mesh(antennaTipGeometry, eyeMaterial);
-    antennaTip.position.y = 0.85;
+    antennaTip.position.y = 0.98;
     antennaTip.castShadow = true;
     head.add(antennaTip);
+
+    // Small antenna lights
+    const antennaLight = new THREE.PointLight(0x00ffff, 0.8, 2);
+    antennaTip.add(antennaLight);
 
     // Position head and add to robot
     head.position.y = 2.8;
@@ -160,127 +225,358 @@ function init() {
 
     // ===== NECK =====
     neck = new THREE.Group();
-    const neckGeometry = new THREE.CylinderGeometry(0.18, 0.22, 0.3, 6);
+    const neckGeometry = new THREE.CylinderGeometry(0.18, 0.22, 0.3, 12);
     const neckMesh = new THREE.Mesh(neckGeometry, whiteMaterial);
     neckMesh.castShadow = true;
     neckMesh.receiveShadow = true;
     neck.add(neckMesh);
+
+    // Neck collar/detail ring
+    const collarGeometry = new THREE.TorusGeometry(0.23, 0.03, 6, 12);
+    const collar = new THREE.Mesh(collarGeometry, darkAccentMaterial);
+    collar.position.y = -0.12;
+    collar.castShadow = true;
+    neck.add(collar);
+
     neck.position.y = 2.35;
     robot.add(neck);
 
     // ===== BODY =====
-    // Main torso (hexagonal prism)
-    const torsoGeometry = new THREE.CylinderGeometry(0.45, 0.5, 1.0, 6);
+    // Main torso (hexagonal prism with more segments)
+    const torsoGeometry = new THREE.CylinderGeometry(0.45, 0.5, 1.0, 12);
     const torso = new THREE.Mesh(torsoGeometry, whiteMaterial);
     torso.position.y = 1.7;
     torso.castShadow = true;
     torso.receiveShadow = true;
     robot.add(torso);
 
-    // Chest panel (flat hexagon detail)
-    const chestPanelGeometry = new THREE.CircleGeometry(0.25, 6);
+    // Torso belt/detail ring
+    const beltGeometry = new THREE.TorusGeometry(0.48, 0.02, 8, 12);
+    const belt = new THREE.Mesh(beltGeometry, darkAccentMaterial);
+    belt.position.y = 1.7;
+    belt.castShadow = true;
+    robot.add(belt);
+
+    // Chest panel (detailed hexagon with vents)
+    const chestPanelGeometry = new THREE.CircleGeometry(0.28, 12);
     const chestPanel = new THREE.Mesh(chestPanelGeometry, whiteMaterial);
     chestPanel.position.set(0, 1.8, 0.46);
     chestPanel.castShadow = true;
     robot.add(chestPanel);
 
-    // Chest light indicator (triangular)
-    const chestLightGeometry = new THREE.CircleGeometry(0.06, 3);
-    const chestLightMaterial = new THREE.MeshStandardMaterial({
-        color: 0x00ff88,
-        emissive: 0x00ff88,
-        emissiveIntensity: 2,
-        flatShading: true,
+    // Chest vents (small circular details)
+    for (let i = 0; i < 6; i++) {
+        const angle = (i / 6) * Math.PI * 2;
+        const ventGeometry = new THREE.CircleGeometry(0.02, 8);
+        const vent = new THREE.Mesh(ventGeometry, darkAccentMaterial);
+        vent.position.set(
+            Math.cos(angle) * 0.15,
+            1.75 + Math.sin(angle) * 0.05,
+            0.47
+        );
+        vent.castShadow = true;
+        robot.add(vent);
+    }
+
+    // Chest light indicators (multiple glowing lights)
+    const lightPositions = [
+        { x: 0, y: 1.85, z: 0.48 },
+        { x: -0.08, y: 1.78, z: 0.48 },
+        { x: 0.08, y: 1.78, z: 0.48 }
+    ];
+
+    lightPositions.forEach((pos, index) => {
+        const lightGeometry = new THREE.CircleGeometry(0.04, 8);
+        const light = new THREE.Mesh(lightGeometry, glowMaterial);
+        light.position.set(pos.x, pos.y, pos.z);
+        robot.add(light);
+
+        // Add point light for each indicator
+        const pointLight = new THREE.PointLight(0x00ff88, 0.5, 4);
+        light.add(pointLight);
     });
-    const chestLight = new THREE.Mesh(chestLightGeometry, chestLightMaterial);
-    chestLight.position.set(0, 1.8, 0.48);
-    robot.add(chestLight);
+
+    // Shoulder pads
+    const shoulderPadGeometry = new THREE.SphereGeometry(0.25, 12, 12);
+    const leftShoulderPad = new THREE.Mesh(shoulderPadGeometry, whiteMaterial);
+    leftShoulderPad.position.set(-0.65, 2.1, 0);
+    leftShoulderPad.castShadow = true;
+    robot.add(leftShoulderPad);
+
+    const rightShoulderPad = new THREE.Mesh(shoulderPadGeometry, whiteMaterial);
+    rightShoulderPad.position.set(0.65, 2.1, 0);
+    rightShoulderPad.castShadow = true;
+    robot.add(rightShoulderPad);
 
     // ===== ARMS =====
-    // Left shoulder (low-poly sphere/icosahedron)
-    const shoulderGeometry = new THREE.SphereGeometry(0.18, 8, 6);
+    // Left arm assembly
+    const leftArmGroup = new THREE.Group();
+
+    // Left shoulder joint (detailed sphere)
+    const shoulderGeometry = new THREE.SphereGeometry(0.18, 12, 12);
     const leftShoulder = new THREE.Mesh(shoulderGeometry, whiteMaterial);
-    leftShoulder.position.set(-0.55, 2.0, 0);
     leftShoulder.castShadow = true;
-    robot.add(leftShoulder);
+    leftArmGroup.add(leftShoulder);
 
-    // Left arm (hexagonal prism)
-    const armGeometry = new THREE.CylinderGeometry(0.11, 0.11, 0.7, 6);
-    const leftArm = new THREE.Mesh(armGeometry, whiteMaterial);
-    leftArm.position.set(-0.65, 1.5, 0);
-    leftArm.rotation.z = 0.2;
-    leftArm.castShadow = true;
-    leftArm.receiveShadow = true;
-    robot.add(leftArm);
+    // Upper arm (hexagonal with more segments)
+    const upperArmGeometry = new THREE.CylinderGeometry(0.13, 0.13, 0.5, 8);
+    const leftUpperArm = new THREE.Mesh(upperArmGeometry, whiteMaterial);
+    leftUpperArm.position.set(-0.1, -0.35, 0);
+    leftUpperArm.castShadow = true;
+    leftUpperArm.receiveShadow = true;
+    leftArmGroup.add(leftUpperArm);
 
-    // Left hand (low-poly sphere)
-    const leftHandGeometry = new THREE.SphereGeometry(0.14, 8, 6);
+    // Elbow joint
+    const elbowGeometry = new THREE.SphereGeometry(0.15, 10, 10);
+    const leftElbow = new THREE.Mesh(elbowGeometry, darkAccentMaterial);
+    leftElbow.position.set(-0.1, -0.7, 0);
+    leftElbow.castShadow = true;
+    leftArmGroup.add(leftElbow);
+
+    // Lower arm
+    const lowerArmGeometry = new THREE.CylinderGeometry(0.11, 0.11, 0.4, 8);
+    const leftLowerArm = new THREE.Mesh(lowerArmGeometry, whiteMaterial);
+    leftLowerArm.position.set(-0.1, -0.95, 0);
+    leftLowerArm.castShadow = true;
+    leftLowerArm.receiveShadow = true;
+    leftArmGroup.add(leftLowerArm);
+
+    // Wrist joint
+    const wristGeometry = new THREE.SphereGeometry(0.12, 10, 10);
+    const leftWrist = new THREE.Mesh(wristGeometry, darkAccentMaterial);
+    leftWrist.position.set(-0.1, -1.2, 0);
+    leftWrist.castShadow = true;
+    leftArmGroup.add(leftWrist);
+
+    // Hand (detailed sphere)
+    const leftHandGeometry = new THREE.SphereGeometry(0.14, 12, 12);
     const leftHand = new THREE.Mesh(leftHandGeometry, whiteMaterial);
-    leftHand.position.set(-0.75, 1.1, 0);
+    leftHand.position.set(-0.1, -1.4, 0);
     leftHand.castShadow = true;
-    robot.add(leftHand);
+    leftArmGroup.add(leftHand);
 
-    // Right shoulder
+    // Finger details (small protrusions)
+    for (let i = 0; i < 3; i++) {
+        const fingerGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.08, 6);
+        const finger = new THREE.Mesh(fingerGeometry, darkAccentMaterial);
+        const angle = (i - 1) * 0.3;
+        finger.position.set(
+            -0.1 + Math.sin(angle) * 0.1,
+            -1.48,
+            Math.cos(angle) * 0.1
+        );
+        finger.rotation.z = angle;
+        finger.castShadow = true;
+        leftArmGroup.add(finger);
+    }
+
+    leftArmGroup.position.set(-0.55, 2.0, 0);
+    leftArmGroup.rotation.z = 0.2;
+    robot.add(leftArmGroup);
+
+    // Right arm assembly (mirrored)
+    const rightArmGroup = new THREE.Group();
+
     const rightShoulder = new THREE.Mesh(shoulderGeometry, whiteMaterial);
-    rightShoulder.position.set(0.55, 2.0, 0);
     rightShoulder.castShadow = true;
-    robot.add(rightShoulder);
+    rightArmGroup.add(rightShoulder);
 
-    // Right arm
-    const rightArm = new THREE.Mesh(armGeometry, whiteMaterial);
-    rightArm.position.set(0.65, 1.5, 0);
-    rightArm.rotation.z = -0.2;
-    rightArm.castShadow = true;
-    rightArm.receiveShadow = true;
-    robot.add(rightArm);
+    const rightUpperArm = new THREE.Mesh(upperArmGeometry, whiteMaterial);
+    rightUpperArm.position.set(0.1, -0.35, 0);
+    rightUpperArm.castShadow = true;
+    rightUpperArm.receiveShadow = true;
+    rightArmGroup.add(rightUpperArm);
 
-    // Right hand
-    const rightHandGeometry = new THREE.SphereGeometry(0.14, 8, 6);
-    const rightHand = new THREE.Mesh(rightHandGeometry, whiteMaterial);
-    rightHand.position.set(0.75, 1.1, 0);
+    const rightElbow = new THREE.Mesh(elbowGeometry, darkAccentMaterial);
+    rightElbow.position.set(0.1, -0.7, 0);
+    rightElbow.castShadow = true;
+    rightArmGroup.add(rightElbow);
+
+    const rightLowerArm = new THREE.Mesh(lowerArmGeometry, whiteMaterial);
+    rightLowerArm.position.set(0.1, -0.95, 0);
+    rightLowerArm.castShadow = true;
+    rightLowerArm.receiveShadow = true;
+    rightArmGroup.add(rightLowerArm);
+
+    const rightWrist = new THREE.Mesh(wristGeometry, darkAccentMaterial);
+    rightWrist.position.set(0.1, -1.2, 0);
+    rightWrist.castShadow = true;
+    rightArmGroup.add(rightWrist);
+
+    const rightHand = new THREE.Mesh(leftHandGeometry, whiteMaterial);
+    rightHand.position.set(0.1, -1.4, 0);
     rightHand.castShadow = true;
-    robot.add(rightHand);
+    rightArmGroup.add(rightHand);
+
+    // Right hand fingers
+    for (let i = 0; i < 3; i++) {
+        const fingerGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.08, 6);
+        const finger = new THREE.Mesh(fingerGeometry, darkAccentMaterial);
+        const angle = (i - 1) * 0.3;
+        finger.position.set(
+            0.1 + Math.sin(angle) * 0.1,
+            -1.48,
+            Math.cos(angle) * 0.1
+        );
+        finger.rotation.z = angle;
+        finger.castShadow = true;
+        rightArmGroup.add(finger);
+    }
+
+    rightArmGroup.position.set(0.55, 2.0, 0);
+    rightArmGroup.rotation.z = -0.2;
+    robot.add(rightArmGroup);
 
     // ===== LOWER BODY =====
-    // Hips (triangular prism / low-poly trapezoid)
-    const hipsGeometry = new THREE.CylinderGeometry(0.35, 0.4, 0.35, 6);
+    // Hips (detailed hexagonal with more segments)
+    const hipsGeometry = new THREE.CylinderGeometry(0.35, 0.4, 0.4, 12);
     const hips = new THREE.Mesh(hipsGeometry, whiteMaterial);
     hips.position.y = 1.0;
     hips.castShadow = true;
     hips.receiveShadow = true;
     robot.add(hips);
 
-    // ===== LEGS =====
-    // Left leg (hexagonal prism)
-    const legGeometry = new THREE.CylinderGeometry(0.14, 0.12, 0.8, 6);
-    const leftLeg = new THREE.Mesh(legGeometry, whiteMaterial);
-    leftLeg.position.set(-0.18, 0.45, 0);
-    leftLeg.castShadow = true;
-    leftLeg.receiveShadow = true;
-    robot.add(leftLeg);
+    // Hip detail panels
+    const hipPanelGeometry = new THREE.CircleGeometry(0.15, 8);
+    const leftHipPanel = new THREE.Mesh(hipPanelGeometry, darkAccentMaterial);
+    leftHipPanel.position.set(-0.25, 1.0, 0.36);
+    leftHipPanel.castShadow = true;
+    robot.add(leftHipPanel);
 
-    // Right leg
-    const rightLeg = new THREE.Mesh(legGeometry, whiteMaterial);
-    rightLeg.position.set(0.18, 0.45, 0);
-    rightLeg.castShadow = true;
-    rightLeg.receiveShadow = true;
-    robot.add(rightLeg);
+    const rightHipPanel = new THREE.Mesh(hipPanelGeometry, darkAccentMaterial);
+    rightHipPanel.position.set(0.25, 1.0, 0.36);
+    rightHipPanel.castShadow = true;
+    robot.add(rightHipPanel);
+
+    // ===== LEGS =====
+    // Left leg assembly
+    const leftLegGroup = new THREE.Group();
+
+    // Hip joint
+    const hipJointGeometry = new THREE.SphereGeometry(0.18, 10, 10);
+    const leftHipJoint = new THREE.Mesh(hipJointGeometry, darkAccentMaterial);
+    leftHipJoint.castShadow = true;
+    leftLegGroup.add(leftHipJoint);
+
+    // Upper leg (thigh)
+    const thighGeometry = new THREE.CylinderGeometry(0.16, 0.14, 0.5, 8);
+    const leftThigh = new THREE.Mesh(thighGeometry, whiteMaterial);
+    leftThigh.position.set(0, -0.35, 0);
+    leftThigh.castShadow = true;
+    leftThigh.receiveShadow = true;
+    leftLegGroup.add(leftThigh);
+
+    // Knee joint
+    const kneeGeometry = new THREE.SphereGeometry(0.15, 10, 10);
+    const leftKnee = new THREE.Mesh(kneeGeometry, darkAccentMaterial);
+    leftKnee.position.set(0, -0.7, 0);
+    leftKnee.castShadow = true;
+    leftLegGroup.add(leftKnee);
+
+    // Lower leg (calf)
+    const calfGeometry = new THREE.CylinderGeometry(0.13, 0.12, 0.45, 8);
+    const leftCalf = new THREE.Mesh(calfGeometry, whiteMaterial);
+    leftCalf.position.set(0, -1.0, 0);
+    leftCalf.castShadow = true;
+    leftCalf.receiveShadow = true;
+    leftLegGroup.add(leftCalf);
+
+    // Ankle joint
+    const ankleGeometry = new THREE.SphereGeometry(0.12, 8, 8);
+    const leftAnkle = new THREE.Mesh(ankleGeometry, darkAccentMaterial);
+    leftAnkle.position.set(0, -1.25, 0);
+    leftAnkle.castShadow = true;
+    leftLegGroup.add(leftAnkle);
+
+    leftLegGroup.position.set(-0.18, 1.15, 0);
+    robot.add(leftLegGroup);
+
+    // Right leg assembly (mirrored)
+    const rightLegGroup = new THREE.Group();
+
+    const rightHipJoint = new THREE.Mesh(hipJointGeometry, darkAccentMaterial);
+    rightHipJoint.castShadow = true;
+    rightLegGroup.add(rightHipJoint);
+
+    const rightThigh = new THREE.Mesh(thighGeometry, whiteMaterial);
+    rightThigh.position.set(0, -0.35, 0);
+    rightThigh.castShadow = true;
+    rightThigh.receiveShadow = true;
+    rightLegGroup.add(rightThigh);
+
+    const rightKnee = new THREE.Mesh(kneeGeometry, darkAccentMaterial);
+    rightKnee.position.set(0, -0.7, 0);
+    rightKnee.castShadow = true;
+    rightLegGroup.add(rightKnee);
+
+    const rightCalf = new THREE.Mesh(calfGeometry, whiteMaterial);
+    rightCalf.position.set(0, -1.0, 0);
+    rightCalf.castShadow = true;
+    rightCalf.receiveShadow = true;
+    rightLegGroup.add(rightCalf);
+
+    const rightAnkle = new THREE.Mesh(ankleGeometry, darkAccentMaterial);
+    rightAnkle.position.set(0, -1.25, 0);
+    rightAnkle.castShadow = true;
+    rightLegGroup.add(rightAnkle);
+
+    rightLegGroup.position.set(0.18, 1.15, 0);
+    robot.add(rightLegGroup);
 
     // ===== FEET =====
-    // Left foot (flat triangular prism)
-    const footGeometry = new THREE.BoxGeometry(0.22, 0.12, 0.35);
+    // Left foot assembly
+    const leftFootGroup = new THREE.Group();
+
+    // Main foot (detailed with more segments)
+    const footGeometry = new THREE.BoxGeometry(0.25, 0.15, 0.4, 8, 8, 8);
     const leftFoot = new THREE.Mesh(footGeometry, whiteMaterial);
-    leftFoot.position.set(-0.18, 0.06, 0.08);
     leftFoot.castShadow = true;
     leftFoot.receiveShadow = true;
-    robot.add(leftFoot);
+    leftFootGroup.add(leftFoot);
 
-    // Right foot
+    // Foot sole detail
+    const soleGeometry = new THREE.BoxGeometry(0.22, 0.02, 0.35);
+    const leftSole = new THREE.Mesh(soleGeometry, darkAccentMaterial);
+    leftSole.position.set(0, -0.07, 0);
+    leftSole.castShadow = true;
+    leftFootGroup.add(leftSole);
+
+    // Toe details (small protrusions)
+    for (let i = 0; i < 4; i++) {
+        const toeGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.06, 6);
+        const toe = new THREE.Mesh(toeGeometry, darkAccentMaterial);
+        toe.position.set(-0.08 + i * 0.05, -0.1, 0.18);
+        toe.castShadow = true;
+        leftFootGroup.add(toe);
+    }
+
+    leftFootGroup.position.set(-0.18, 0.06, 0.08);
+    robot.add(leftFootGroup);
+
+    // Right foot assembly (mirrored)
+    const rightFootGroup = new THREE.Group();
+
     const rightFoot = new THREE.Mesh(footGeometry, whiteMaterial);
-    rightFoot.position.set(0.18, 0.06, 0.08);
     rightFoot.castShadow = true;
     rightFoot.receiveShadow = true;
-    robot.add(rightFoot);
+    rightFootGroup.add(rightFoot);
+
+    const rightSole = new THREE.Mesh(soleGeometry, darkAccentMaterial);
+    rightSole.position.set(0, -0.07, 0);
+    rightSole.castShadow = true;
+    rightFootGroup.add(rightSole);
+
+    // Right foot toes
+    for (let i = 0; i < 4; i++) {
+        const toeGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.06, 6);
+        const toe = new THREE.Mesh(toeGeometry, darkAccentMaterial);
+        toe.position.set(-0.08 + i * 0.05, -0.1, 0.18);
+        toe.castShadow = true;
+        rightFootGroup.add(toe);
+    }
+
+    rightFootGroup.position.set(0.18, 0.06, 0.08);
+    robot.add(rightFootGroup);
 
     scene.add(robot);
 
